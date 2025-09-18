@@ -1,5 +1,5 @@
-# Fruit_Jam_Application
- Template for a CircuitPython application for the Adafruit Fruit Jam which is compatible with Fruit Jam OS.
+# Fruit Jam Pong
+Tutorial code for how to make a simple pong game for the Adafruit Fruit Jam in CircuitPython 
 
 ## Building
 Ensure that you have python 3.x installed system-wide and all the prerequisite libraries installed using the following command:
