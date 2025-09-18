@@ -102,5 +102,4 @@ async def main() -> None:
 try:
     asyncio.run(main())
 except KeyboardInterrupt:
-    # TODO: Deinit
-    pass
+    peripherals.deinit()
