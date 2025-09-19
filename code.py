@@ -240,7 +240,7 @@ async def gameplay_task() -> None:
         # see if we've collided with a paddle
         if (velocity_x < 0 and collides(ball, paddles[0])) or (velocity_x > 0 and collides(ball, paddles[1])):
             velocity_x = -velocity_x  # invert x velocity
-            ball_speed *= BALL_SPEED_MODIFIER
+            ball_speed = min(ball_speed * BALL_SPEED_MODIFIER, PADDLE_SPEED)
 
         # check if we've gone out of bounds
         if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >= display.width):
