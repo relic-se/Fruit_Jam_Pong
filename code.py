@@ -14,6 +14,7 @@ import displayio
 import sys
 import supervisor
 from terminalio import FONT
+import vectorio
 
 from adafruit_display_text.label import Label
 import adafruit_fruitjam.peripherals
@@ -28,10 +29,7 @@ except ImportError:
 
 # setup display
 displayio.release_displays()
-try:
-    adafruit_fruitjam.peripherals.request_display_config()  # user display configuration
-except ValueError:  # invalid user config or no user config provided
-    adafruit_fruitjam.peripherals.request_display_config(720, 400)  # default display size
+adafruit_fruitjam.peripherals.request_display_config(320, 240)
 display = supervisor.runtime.display
 
 # setup audio, buttons, and neopixels
@@ -51,12 +49,38 @@ else:
 root_group = displayio.Group()
 display.root_group = root_group
 
-# example text
-root_group.append(Label(
-    font=FONT, text="Hello, World!",
-    anchor_point=(.5, .5),
-    anchored_position=(display.width//2, display.height//2),
+# generate simple foreground palette
+foreground_palette = displayio.Palette(1)
+foreground_palette[0] = 0xffffff
+
+# center line
+root_group.append(vectorio.Rectangle(
+    pixel_shader=foreground_palette,
+    width=2, height=display.height,
+    x=display.width//2-1, y=0,
 ))
+
+# score labels
+labels = []
+for i in range(2):
+    label = Label(
+        font=FONT, text="0", color=foreground_palette[0], scale=2,
+        anchor_point=(.5, 0), anchored_position=(display.width*(1+i*2)//4, 4),
+    )
+    root_group.append(label)
+    labels.append(label)
+
+# paddles
+paddles = []
+for i in range(2):
+    paddle = vectorio.Rectangle(
+        pixel_shader=foreground_palette,
+        width=4, height=32,
+        x=(display.width-16 if i else 16),
+        y=display.height//2-8,
+    )
+    root_group.append(paddle)
+    paddles.append(paddle)
 
 # mouse control
 async def mouse_task() -> None:
