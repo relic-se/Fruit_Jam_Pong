@@ -169,7 +169,13 @@ async def gamepad_task() -> None:
         await asyncio.sleep(1/30 if any(gamepad.connected for gamepad in gamepads) else 1)  # sleep longer if there are no gamepads connected
 
 async def gameplay_task() -> None:
+    ball_velocity = (1, 1)  # (x, y) as a factor of BALL_SPEED
     while True:
+
+        # apply velocity to ball position
+        ball.x += ball_velocity[0] * BALL_SPEED
+        ball.y += ball_velocity[1] * BALL_SPEED
+        
         await asyncio.sleep(1/30)
 
 
