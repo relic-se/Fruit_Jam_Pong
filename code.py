@@ -111,6 +111,19 @@ async def mouse_task() -> None:
             previous_pressed_btns = []
             while timeouts < 9999:
                 pressed_btns = mouse.update()
+
+                # restrict mouse x position to paddle
+                mouse.x = paddle.x + paddle.width // 2
+
+                # limit mouse y position
+                if mouse.y < paddle.height // 2:
+                    mouse.y = paddle.height // 2
+                elif mouse.y > display.height - paddle.height // 2:
+                    mouse.y = display.height - paddle.height // 2
+                
+                # assign mouse position to paddle
+                paddles[0].y = mouse.y
+
                 if pressed_btns is None:
                     timeouts += 1
                 else:
