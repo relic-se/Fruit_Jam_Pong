@@ -105,9 +105,7 @@ def paddle_move(direction: int, player: int = 0) -> None:
 async def mouse_task() -> None:
     while True:
         if (mouse := adafruit_usb_host_mouse.find_and_init_boot_mouse("bitmaps/cursor.bmp")) is not None:
-            mouse.tilegrid.x = display.width // 2
-            mouse.tilegrid.y = display.height // 2
-            root_group.append(mouse.tilegrid)
+            mouse.y = display.height // 2
 
             timeouts = 0
             previous_pressed_btns = []
@@ -121,7 +119,6 @@ async def mouse_task() -> None:
                         pass
                 previous_pressed_btns = pressed_btns
                 await asyncio.sleep(1/30)
-            root_group.remove(mouse.tilegrid)
         await asyncio.sleep(1)
 
 async def keyboard_task() -> None:
