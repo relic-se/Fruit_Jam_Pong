@@ -169,12 +169,16 @@ async def gamepad_task() -> None:
         await asyncio.sleep(1/30 if any(gamepad.connected for gamepad in gamepads) else 1)  # sleep longer if there are no gamepads connected
 
 async def gameplay_task() -> None:
-    ball_velocity = (1, 1)  # (x, y) as a factor of BALL_SPEED
+    ball_velocity = [1, 1]  # x & y as a factor of BALL_SPEED
     while True:
 
         # apply velocity to ball position
         ball.x += ball_velocity[0] * BALL_SPEED
         ball.y += ball_velocity[1] * BALL_SPEED
+
+        # only check if we've hit the bottom if our y velocity is positive and if we've hit the top if our y velocity is negative
+        if (ball_velocity[1] > 0 and ball.y >= display.height - ball.height) or (ball_velocity[1] < 0 and ball.y <= 0):
+            ball_velocity[1] = -ball_velocity[1]  # invert our y velocity
         
         await asyncio.sleep(1/30)
 
