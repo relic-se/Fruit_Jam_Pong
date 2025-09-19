@@ -33,7 +33,6 @@ PADDLE_SPEED = 2
 BALL_SPEED = 2
 
 # setup display
-displayio.release_displays()
 adafruit_fruitjam.peripherals.request_display_config(320, 240)
 display = supervisor.runtime.display
 
