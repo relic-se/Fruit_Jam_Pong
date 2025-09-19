@@ -27,6 +27,9 @@ try:
 except ImportError:
     config = None
 
+# program constants
+PADDLE_SPEED = 2
+
 # setup display
 displayio.release_displays()
 adafruit_fruitjam.peripherals.request_display_config(320, 240)
@@ -82,6 +85,22 @@ for i in range(2):
     root_group.append(paddle)
     paddles.append(paddle)
 
+# ball
+ball = vectorio.Rectangle(
+    pixel_shader=foreground_palette,
+    width=8, height=8,
+    x=display.width//2-4, y=display.height//2-4,
+)
+root_group.append(ball)
+
+# paddle movement method
+def paddle_move(direction: int, player: int = 0) -> None:
+    direction = 1 if direction > 0 else -1  # restrict direction to 1 or -1
+    y = paddles[player].y  # create temporary copy of y position
+    y -= direction * PADDLE_SPEED  # apply movement
+    y = min(max(y, 0), display.height - paddle.height)  # clamp the position to the playfield
+    paddles[player].y = y  # update rectangle position
+
 # mouse control
 async def mouse_task() -> None:
     while True:
@@ -113,6 +132,10 @@ async def keyboard_task() -> None:
     while True:
         while (c := supervisor.runtime.serial_bytes_available) > 0:
             key = sys.stdin.read(c)
+            if key == "\x1b[A" or key == "\x1b[D":  # up or left
+                paddle_move(1)
+            elif key == "\x1b[B" or key == "\x1b[C":  # down or right
+                paddle_move(-1)
             if key == "\x1b":  # escape
                 supervisor.reload()
         await asyncio.sleep(1/30)
