@@ -31,7 +31,8 @@ except ImportError:
 
 # program constants
 PADDLE_SPEED = 2
-BALL_SPEED = 2
+INITIAL_BALL_SPEED = 0.5
+BALL_SPEED_MODIFIER = 1.2
 WIN_SCORE = 11
 WIN_DIFF = 2
 
@@ -120,7 +121,7 @@ def paddle_move(direction: int, player: int = 0) -> None:
 
 # global variable to indicate that we are waiting for user input
 waiting = False
-async def wait() -> None:
+async def wait_input() -> None:
     global waiting
     waiting = True
     while waiting:
@@ -193,7 +194,7 @@ async def gamepad_task() -> None:
                     paddle_move(1, player=i)
                 elif gamepad.buttons.DOWN or gamepad.buttons.JOYSTICK_DOWN:  # down
                     paddle_move(-1, player=i)
-                if gamepad.buttons.A:  # A or X on DS4
+                if gamepad.buttons.A or gamepad.buttons.START:  # A or X on DS4
                     waiting = False
                 if gamepad.buttons.HOME:  # home
                     peripherals.deinit()
@@ -220,15 +221,17 @@ async def gameplay_task() -> None:
     global waiting
 
     # wait for initial input
-    await wait()
-    
-    # start with random velocity
-    velocity_x, velocity_y = get_random_velocity()  # x & y as a factor of BALL_SPEED
+    await wait_input()
+
+    ball_x, ball_y = ball.x, ball.y
+    velocity_x, velocity_y = get_random_velocity()  # start with random velocity
+    ball_speed = INITIAL_BALL_SPEED
     while True:
 
         # apply velocity to ball position
-        ball.x += velocity_x * BALL_SPEED
-        ball.y += velocity_y * BALL_SPEED
+        ball_x += velocity_x * ball_speed
+        ball_y += velocity_y * ball_speed
+        ball.x, ball.y = int(ball_x), int(ball_y)
 
         # only check if we've hit the bottom if y velocity is positive and if we've hit the top if y velocity is negative
         if (velocity_y < 0 and ball.y <= 0) or (velocity_y > 0 and ball.y + ball.height >= display.height):
@@ -237,33 +240,38 @@ async def gameplay_task() -> None:
         # see if we've collided with a paddle
         if (velocity_x < 0 and collides(ball, paddles[0])) or (velocity_x > 0 and collides(ball, paddles[1])):
             velocity_x = -velocity_x  # invert x velocity
+            ball_speed *= BALL_SPEED_MODIFIER
 
         # check if we've gone out of bounds
         if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >= display.width):
             # reset ball position to center
             ball.x = (display.width - ball.width) // 2
             ball.y = (display.height - ball.height) // 2
+            ball_x, ball_y = ball.x, ball.y
 
             # randomize velocity
             velocity_x, velocity_y = get_random_velocity()
 
+            # reset ball speed
+            ball_speed = INITIAL_BALL_SPEED
+
             # add to player score depending on x velocity direction
-            player = int(velocity_x < 0)
-            score = int(score_labels[player].text)
-            score += 1
-            score_labels[player].text = str(score)
+            player = int(velocity_x < 0)  # use velocity boolean as int of 0 or 1
+            score = int(score_labels[player].text)  # obtain current score from label text string
+            score += 1  # increment player score
+            score_labels[player].text = str(score)  # update score label but keep integer variable for later checks
 
             # check if we are above the minimum win score
             if score >= WIN_SCORE:
                 # check if we are at least 2 points above the other player
-                other_player = 1 - player
-                other_score = int(score_labels[other_player].text)
+                other_player = 1 - player  # invert player index
+                other_score = int(score_labels[other_player].text)  # obtain other player's score form label text string
                 if score - other_score >= WIN_DIFF:
                     # show win label
                     win_labels[player].hidden = False
 
                     # wait for user input
-                    await wait()
+                    await wait_input()
 
                     # hide win label
                     win_labels[player].hidden = True
