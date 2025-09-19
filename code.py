@@ -113,13 +113,13 @@ async def mouse_task() -> None:
                 pressed_btns = mouse.update()
 
                 # restrict mouse x position to paddle
-                mouse.x = paddle.x + paddle.width // 2
+                mouse.x = paddles[0].x + paddles[0].width // 2
 
                 # limit mouse y position
-                if mouse.y < paddle.height // 2:
-                    mouse.y = paddle.height // 2
-                elif mouse.y > display.height - paddle.height // 2:
-                    mouse.y = display.height - paddle.height // 2
+                if mouse.y < paddles[0].height // 2:
+                    mouse.y = paddles[0].height // 2
+                elif mouse.y > display.height - paddles[0].height // 2:
+                    mouse.y = display.height - paddles[0].height // 2
                 
                 # assign mouse position to paddle
                 paddles[0].y = mouse.y
