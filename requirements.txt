@@ -3,3 +3,4 @@ adafruit_fruitjam
 adafruit_pathlib
 adafruit_usb_host_mouse
 asyncio
+relic_usb_host_gamepad

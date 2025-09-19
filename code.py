@@ -19,6 +19,7 @@ import vectorio
 from adafruit_display_text.label import Label
 import adafruit_fruitjam.peripherals
 import adafruit_usb_host_mouse
+import relic_usb_host_gamepad
 
 # get Fruit Jam OS config if available
 try:
