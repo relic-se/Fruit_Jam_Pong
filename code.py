@@ -169,11 +169,17 @@ async def gamepad_task() -> None:
                     supervisor.reload()
         await asyncio.sleep(1/30 if any(gamepad.connected for gamepad in gamepads) else 1)  # sleep longer if there are no gamepads connected
 
+async def gameplay_task() -> None:
+    while True:
+        await asyncio.sleep(1/30)
+
+
 async def main() -> None:
     await asyncio.gather(
         asyncio.create_task(mouse_task()),
         asyncio.create_task(keyboard_task()),
         asyncio.create_task(gamepad_task()),
+        asyncio.create_task(gameplay_task()),
     )
 
 try:
