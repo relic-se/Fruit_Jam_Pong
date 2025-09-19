@@ -148,13 +148,31 @@ async def keyboard_task() -> None:
             elif key == "\x1b[B" or key == "\x1b[C":  # down or right
                 paddle_move(-1)
             if key == "\x1b":  # escape
+                peripherals.deinit()
                 supervisor.reload()
         await asyncio.sleep(1/30)
+
+# initialize left and right player gamepads
+gamepads = [relic_usb_host_gamepad.Gamepad(port=i+1) for i in range(2)]
+
+async def gamepad_task() -> None:
+    while True:
+        for i, gamepad in enumerate(gamepads):
+            if gamepad.update():
+                if gamepad.buttons.UP or gamepad.buttons.JOYSTICK_UP:  # up
+                    paddle_move(1, player=i)
+                elif gamepad.buttons.DOWN or gamepad.buttons.JOYSTICK_DOWN:  # down
+                    paddle_move(-1, player=i)
+                if gamepad.buttons.HOME:  # home
+                    peripherals.deinit()
+                    supervisor.reload()
+        await asyncio.sleep(1/30 if any(gamepad.connected for gamepad in gamepads) else 1)  # sleep longer if there are no gamepads connected
 
 async def main() -> None:
     await asyncio.gather(
         asyncio.create_task(mouse_task()),
         asyncio.create_task(keyboard_task()),
+        asyncio.create_task(gamepad_task()),
     )
 
 try:
