@@ -30,6 +30,7 @@ except ImportError:
 
 # program constants
 PADDLE_SPEED = 2
+BALL_SPEED = 2
 
 # setup display
 displayio.release_displays()
