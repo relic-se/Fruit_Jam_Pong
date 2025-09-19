@@ -30,9 +30,9 @@ except ImportError:
     config = None
 
 # program constants
-PADDLE_SPEED = 2
-INITIAL_BALL_SPEED = 0.5
-BALL_SPEED_MODIFIER = 1.2
+PADDLE_SPEED = 6
+INITIAL_BALL_SPEED = 1
+BALL_SPEED_MODIFIER = 1.25
 WIN_SCORE = 11
 WIN_DIFF = 2
 
@@ -149,7 +149,7 @@ async def mouse_task() -> None:
                     mouse.y = display.height - paddles[0].height // 2
                 
                 # assign mouse position to paddle
-                paddles[0].y = mouse.y
+                paddles[0].y = mouse.y - paddles[0].height // 2
 
                 if pressed_btns is None:
                     timeouts += 1
