@@ -119,8 +119,8 @@ async def keyboard_task() -> None:
 
 async def main() -> None:
     await asyncio.gather(
-        mouse_task,
-        keyboard_task,
+        asyncio.create_task(mouse_task()),
+        asyncio.create_task(keyboard_task()),
     )
 
 try:
