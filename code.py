@@ -268,6 +268,20 @@ async def gamepad_task() -> None:
                     supervisor.reload()
         await asyncio.sleep(1/30 if any(gamepad.connected for gamepad in gamepads) else 1)  # sleep longer if there are no gamepads connected
 
+async def buttons_task() -> None:
+    global waiting
+    while True:
+        if peripherals.button3:  # up
+            paddle_move(1)
+        elif peripherals.button1:  # down
+            paddle_move(-1)
+        if waiting and peripherals.button2:  # continue
+            waiting = False
+        if peripherals.button1 and peripherals.button2 and peripherals.button3:  # all buttons = exit
+            peripherals.deinit()
+            supervisor.reload()
+        await asyncio.sleep(1/30)
+
 def get_random_velocity() -> tuple:  # returns (-1 or 1, -1 or 1)
     return (
         random.randint(0, 1) * 2 - 1,  # either -1 or 1
@@ -411,6 +425,7 @@ async def main() -> None:
         asyncio.create_task(mouse_task()),
         asyncio.create_task(keyboard_task()),
         asyncio.create_task(gamepad_task()),
+        asyncio.create_task(buttons_task()),
         asyncio.create_task(gameplay_task()),
         asyncio.create_task(computer_task()),
     )
