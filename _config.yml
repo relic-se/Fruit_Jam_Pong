@@ -1,0 +1,6 @@
+remote_theme: pages-themes/cayman@v0.2.0
+
+title: CircuitPython Fruit Jam Pong Game Tutorial
+description: Making a simple pong game for the Adafruit Fruit Jam in CircuitPython
+
+google_analytics: G-K7K92DE878
