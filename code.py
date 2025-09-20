@@ -109,6 +109,7 @@ ball = vectorio.Rectangle(
     width=8, height=8,
     x=display.width//2-4, y=display.height//2-4,
 )
+ball.hidden = True  # start out hidden
 root_group.append(ball)
 
 # paddle movement method
@@ -223,6 +224,9 @@ async def gameplay_task() -> None:
     # wait for initial input
     await wait_input()
 
+    # show the ball
+    ball.hidden = False
+
     ball_x, ball_y = ball.x, ball.y
     velocity_x, velocity_y = get_random_velocity()  # start with random velocity
     ball_speed = INITIAL_BALL_SPEED
@@ -244,16 +248,9 @@ async def gameplay_task() -> None:
 
         # check if we've gone out of bounds
         if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >= display.width):
-            # reset ball position to center
-            ball.x = (display.width - ball.width) // 2
-            ball.y = (display.height - ball.height) // 2
-            ball_x, ball_y = ball.x, ball.y
 
-            # randomize velocity
-            velocity_x, velocity_y = get_random_velocity()
-
-            # reset ball speed
-            ball_speed = INITIAL_BALL_SPEED
+            # hide ball
+            ball.hidden = True
 
             # add to player score depending on x velocity direction
             player = int(velocity_x < 0)  # use velocity boolean as int of 0 or 1
@@ -279,6 +276,24 @@ async def gameplay_task() -> None:
                     # reset scores
                     for label in score_labels:
                         label.text = "0"
+            
+            else:
+                # delay before showing ball again and continuing
+                await asyncio.sleep(1)
+
+            # reset ball position to center
+            ball.x = (display.width - ball.width) // 2
+            ball.y = (display.height - ball.height) // 2
+            ball_x, ball_y = ball.x, ball.y
+
+            # randomize velocity
+            velocity_x, velocity_y = get_random_velocity()
+
+            # reset ball speed
+            ball_speed = INITIAL_BALL_SPEED
+
+            # show the ball
+            ball.hidden = False
 
         await asyncio.sleep(1/30)
 
