@@ -9,12 +9,9 @@ if len(__file__.split("/")[:-1]) > 1:
         import sys
         sys.path.append(str(modules_directory.absolute()))
 
-import audiomixer
-import array
 import asyncio
 import displayio
 import random
-import synthio
 import sys
 import supervisor
 from terminalio import FONT
@@ -24,7 +21,6 @@ from adafruit_display_text.label import Label
 import adafruit_fruitjam.peripherals
 import adafruit_usb_host_mouse
 import relic_usb_host_gamepad
-import relic_waveform
 
 # get Fruit Jam OS config if available
 try:
@@ -39,18 +35,14 @@ INITIAL_BALL_SPEED = 1
 BALL_SPEED_MODIFIER = 1.25
 WIN_SCORE = 11
 WIN_DIFF = 2
-COMPUTER_MIN_TIME = .1
-COMPUTER_MAX_TIME = .4
 
 # setup display
 adafruit_fruitjam.peripherals.request_display_config(320, 240)
 display = supervisor.runtime.display
 
 # setup audio, buttons, and neopixels
-SAMPLE_RATE = 32000
 peripherals = adafruit_fruitjam.peripherals.Peripherals(
     safe_volume_limit=(config.audio_volume_override_danger if config is not None else 12),
-    sample_rate=SAMPLE_RATE,
 )
 
 # user-defined audio output and volume
@@ -60,61 +52,6 @@ if config is not None:
 else:
     peripherals.audio_output = "headphone"
     peripherals.volume = 12
-
-# create sound effects
-if peripherals.audio:
-    # set up synthesizer
-    synth = synthio.Synthesizer(
-        sample_rate=SAMPLE_RATE,
-        channel_count=1,
-    )
-
-    # set up mixer
-    mixer = audiomixer.Mixer(
-        voice_count=1,
-        sample_rate=SAMPLE_RATE,
-        channel_count=1,
-    )
-
-    # play synthesizer through mixer and audio output
-    peripherals.audio.play(mixer)
-    mixer.play(synth)
-
-    # original pong game can only generate square waves at a one frequency and +1 octave up
-    FREQUENCY = 245
-    WAVEFORM = relic_waveform.mix(  # mixes waveforms together
-        (relic_waveform.square(size=64), .8),  # primary sound is a square wave
-        (relic_waveform.noise(size=64), .2),  # add a little bit of noise into the mix for more authenticity
-    )  # using size to "tune" noise
-    LFO_WAVEFORM = array.array('h', [32767, 32767, 0, 0])
-    def generate_note(duration: float, octave: int = 0, amplitude: float = 1) -> synthio.Note:
-        return synthio.Note(
-            frequency=FREQUENCY * pow(2, octave),
-            waveform=WAVEFORM,
-            envelope=synthio.Envelope(
-                attack_time=0.01, attack_level=1, decay_time=0,
-                sustain_level=1, release_time=0,
-            ),
-            amplitude=synthio.LFO(
-                waveform=LFO_WAVEFORM,
-                scale=amplitude,  # should be full amplitude for first half and and 0 for second
-                rate=1/(duration*2),  # .04s is our duration, doubled for second half of square wave
-                interpolate=False, once=True,
-            ),
-        )
-    
-    # all of these values are based on the original pong arcade audio
-    SFX_WALL = generate_note(.016)
-    SFX_PADDLE = generate_note(.032, 1)
-    SFX_SCORE = generate_note(.51)
-
-else:
-    SFX_WALL = SFX_SCORE = SFX_PADDLE = None
-
-def play_sfx(note: synthio.Note) -> None:
-    if peripherals.audio:
-        note.amplitude.retrigger()  # make sure we reset our amplitude lfo
-        synth.release_all_then_press(note)  # we only want to play one sound at a time
 
 # create root group
 root_group = displayio.Group()
@@ -173,9 +110,6 @@ ball = vectorio.Rectangle(
     x=display.width//2-4, y=display.height//2-4,
 )
 ball.hidden = True  # start out hidden
-if peripherals.neopixels:  # clear ball position on neopixels
-    peripherals.neopixels.fill(0)
-    peripherals.neopixels.show()
 root_group.append(ball)
 
 # paddle movement method
@@ -298,18 +232,8 @@ def collides(a: vectorio.Rectangle, b: vectorio.Rectangle) -> bool:
     # rectangles must intersect
     return True
 
-def apply_brightness(value:int, brightness:float) -> int:
-    for i in range(3):
-        c = (value >> (8 * i)) & 0xff  # extract color component (rgb)
-        c = int(c * brightness)  # apply brightness
-        c = min(max(c, 0x00), 0xff)  # clamp value to acceptable range
-        value &= 0xffffff ^ (0xff << (8 * i))  # remove old component value
-        value |= c << (8 * i)  # insert new component value
-    return value
-
-computer_move = 0
 async def gameplay_task() -> None:
-    global waiting, computer_move
+    global waiting
 
     # wait for initial input
     await wait_input()
@@ -330,45 +254,23 @@ async def gameplay_task() -> None:
         # only check if we've hit the bottom if y velocity is positive and if we've hit the top if y velocity is negative
         if (velocity_y < 0 and ball.y <= 0) or (velocity_y > 0 and ball.y + ball.height >= display.height):
             velocity_y = -velocity_y  # invert y velocity
-            play_sfx(SFX_WALL)
         
         # see if we've collided with a paddle
         if (velocity_x < 0 and collides(ball, paddles[0])) or (velocity_x > 0 and collides(ball, paddles[1])):
             velocity_x = -velocity_x  # invert x velocity
             ball_speed = min(ball_speed * BALL_SPEED_MODIFIER, PADDLE_SPEED)  # increase ball speed by modifier
-            play_sfx(SFX_PADDLE)
-
-        # control computer player if gamepad isn't connected
-        if not gamepads[1].connected and computer_move != 0:
-            paddle_move(computer_move, 1)
-
-        # light up neopixel based on ball position
-        if peripherals.neopixels:
-            # determine ball float position from 0 to n-1
-            pos = ball.x / display.width * (peripherals.neopixels.n - 1)
-            for i in range(peripherals.neopixels.n):
-                # calculate difference from current index to ball position
-                diff = abs(pos - i)
-                # apply foreground color brightness based on distance to ball position
-                peripherals.neopixels[i] = apply_brightness(foreground_palette[0], 1 - diff) if diff < 1 else 0
-            peripherals.neopixels.show()
 
         # check if we've gone out of bounds
         if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >= display.width):
 
             # hide ball
             ball.hidden = True
-            if peripherals.neopixels:
-                peripherals.neopixels.fill(0)
-                peripherals.neopixels.show()
 
             # add to player score depending on x velocity direction
             player = int(velocity_x < 0)  # use velocity boolean as int of 0 or 1
             score = int(score_labels[player].text)  # obtain current score from label text string
             score += 1  # increment player score
             score_labels[player].text = str(score)  # update score label but keep integer variable for later checks
-
-            play_sfx(SFX_SCORE)
 
             # check if we are above the minimum win score
             if score >= WIN_SCORE:
@@ -409,16 +311,6 @@ async def gameplay_task() -> None:
 
         await asyncio.sleep(1/30)
 
-async def computer_task() -> None:
-    global waiting, computer_move
-    paddle = paddles[1]
-    while True:
-        if waiting or 0 < ball.y - paddle.y < paddle.height:  # if gameplay has stopped or we're facing the ball
-            computer_move = 0
-        else:
-            computer_move = int(ball.y < paddle.y) * 2 - 1  # should be 1 if ball is below or -1 if ball is above
-        await asyncio.sleep(random.random() * (COMPUTER_MAX_TIME - COMPUTER_MIN_TIME) + COMPUTER_MIN_TIME)
-
 async def main() -> None:
     await asyncio.gather(
         asyncio.create_task(mouse_task()),
@@ -426,7 +318,6 @@ async def main() -> None:
         asyncio.create_task(gamepad_task()),
         asyncio.create_task(buttons_task()),
         asyncio.create_task(gameplay_task()),
-        asyncio.create_task(computer_task()),
     )
 
 try:

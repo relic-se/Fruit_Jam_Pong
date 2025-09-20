@@ -173,9 +173,6 @@ ball = vectorio.Rectangle(
     x=display.width//2-4, y=display.height//2-4,
 )
 ball.hidden = True  # start out hidden
-if peripherals.neopixels:  # clear ball position on neopixels
-    peripherals.neopixels.fill(0)
-    peripherals.neopixels.show()
 root_group.append(ball)
 
 # paddle movement method
@@ -298,15 +295,6 @@ def collides(a: vectorio.Rectangle, b: vectorio.Rectangle) -> bool:
     # rectangles must intersect
     return True
 
-def apply_brightness(value:int, brightness:float) -> int:
-    for i in range(3):
-        c = (value >> (8 * i)) & 0xff  # extract color component (rgb)
-        c = int(c * brightness)  # apply brightness
-        c = min(max(c, 0x00), 0xff)  # clamp value to acceptable range
-        value &= 0xffffff ^ (0xff << (8 * i))  # remove old component value
-        value |= c << (8 * i)  # insert new component value
-    return value
-
 computer_move = 0
 async def gameplay_task() -> None:
     global waiting, computer_move
@@ -342,25 +330,11 @@ async def gameplay_task() -> None:
         if not gamepads[1].connected and computer_move != 0:
             paddle_move(computer_move, 1)
 
-        # light up neopixel based on ball position
-        if peripherals.neopixels:
-            # determine ball float position from 0 to n-1
-            pos = ball.x / display.width * (peripherals.neopixels.n - 1)
-            for i in range(peripherals.neopixels.n):
-                # calculate difference from current index to ball position
-                diff = abs(pos - i)
-                # apply foreground color brightness based on distance to ball position
-                peripherals.neopixels[i] = apply_brightness(foreground_palette[0], 1 - diff) if diff < 1 else 0
-            peripherals.neopixels.show()
-
         # check if we've gone out of bounds
         if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >= display.width):
 
             # hide ball
             ball.hidden = True
-            if peripherals.neopixels:
-                peripherals.neopixels.fill(0)
-                peripherals.neopixels.show()
 
             # add to player score depending on x velocity direction
             player = int(velocity_x < 0)  # use velocity boolean as int of 0 or 1
