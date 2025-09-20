@@ -39,6 +39,8 @@ INITIAL_BALL_SPEED = 1
 BALL_SPEED_MODIFIER = 1.25
 WIN_SCORE = 11
 WIN_DIFF = 2
+COMPUTER_MIN_TIME = .1
+COMPUTER_MAX_TIME = .4
 
 # setup display
 adafruit_fruitjam.peripherals.request_display_config(320, 240)
@@ -279,8 +281,9 @@ def collides(a: vectorio.Rectangle, b: vectorio.Rectangle) -> bool:
     # rectangles must intersect
     return True
 
+computer_move = 0
 async def gameplay_task() -> None:
-    global waiting
+    global waiting, computer_move
 
     # wait for initial input
     await wait_input()
@@ -297,6 +300,9 @@ async def gameplay_task() -> None:
         ball_x += velocity_x * ball_speed
         ball_y += velocity_y * ball_speed
         ball.x, ball.y = int(ball_x), int(ball_y)
+
+        if not gamepads[1].connected and computer_move != 0:
+            paddle_move(computer_move, 1)
 
         # only check if we've hit the bottom if y velocity is positive and if we've hit the top if y velocity is negative
         if (velocity_y < 0 and ball.y <= 0) or (velocity_y > 0 and ball.y + ball.height >= display.height):
@@ -362,6 +368,16 @@ async def gameplay_task() -> None:
 
         await asyncio.sleep(1/30)
 
+async def computer_task() -> None:
+    global waiting, computer_move
+    paddle = paddles[1]
+    while True:
+        if waiting or 0 < ball.y - paddle.y < paddle.height:  # if gameplay has stopped or we're facing the ball
+            computer_move = 0
+        else:
+            computer_move = int(ball.y < paddle.y) * 2 - 1  # should be 1 if ball is below or -1 if ball is above
+        await asyncio.sleep(random.random() * (COMPUTER_MAX_TIME - COMPUTER_MIN_TIME) + COMPUTER_MIN_TIME)
+
 
 async def main() -> None:
     await asyncio.gather(
@@ -369,6 +385,7 @@ async def main() -> None:
         asyncio.create_task(keyboard_task()),
         asyncio.create_task(gamepad_task()),
         asyncio.create_task(gameplay_task()),
+        asyncio.create_task(computer_task()),
     )
 
 try:
