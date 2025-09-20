@@ -6,4 +6,4 @@ TODO
 
 Your code should now look something like this...
 
-https://github.com/relic-se/Fruit_Jam_Pong/blob/main/guide/1_bootstrap.py
+https://github.com/relic-se/Fruit_Jam_Pong/blob/main/guide/1_bootstrap.py#L1-L106
