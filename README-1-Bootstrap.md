@@ -4,6 +4,4 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this...
-
-https://github.com/relic-se/Fruit_Jam_Pong/blob/4c25204d8723d64cd20239047f6da19515319273/guide/1_bootstrap.py#L1-L106
+Your code should now look something like this: [1_bootstrap.py](./guide/1_bootstrap.py).

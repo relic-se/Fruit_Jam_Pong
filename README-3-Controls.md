@@ -4,6 +4,4 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this...
-
-https://github.com/relic-se/Fruit_Jam_Pong/blob/4c25204d8723d64cd20239047f6da19515319273/guide/3_controls.py#L1-L193
+Your code should now look something like this: [3_controls.py](./guide/3_controls.py).
