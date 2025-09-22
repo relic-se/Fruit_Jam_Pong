@@ -4,4 +4,5 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this: [8_computer-control.py](./guide/8_computer-control.py).
+Your code should now look something like this:
+> [guide/8_computer-control.py](./guide/8_computer-control.py)

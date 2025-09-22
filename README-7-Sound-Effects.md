@@ -4,4 +4,5 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this: [7_sound-effects.py](./guide/7_sound-effects.py).
+Your code should now look something like this:
+> [guide/7_sound-effects.py](./guide/7_sound-effects.py)

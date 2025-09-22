@@ -4,4 +4,5 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this: [4_ball-movement.py](./guide/4_ball-movement.py).
+Your code should now look something like this:
+> [guide/4_ball-movement.py](./guide/4_ball-movement.py)

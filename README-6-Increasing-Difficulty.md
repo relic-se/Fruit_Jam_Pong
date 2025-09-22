@@ -4,4 +4,5 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this: [6_increasing-difficulty.py](./guide/6_increasing-difficulty.py).
+Your code should now look something like this:
+> [guide/6_increasing-difficulty.py](./guide/6_increasing-difficulty.py)

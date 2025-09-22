@@ -4,4 +4,5 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this: [9_neopixels.py](./guide/9_neopixels.py).
+Your code should now look something like this:
+> [guide/9_neopixels.py](./guide/9_neopixels.py)

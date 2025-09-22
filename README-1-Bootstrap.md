@@ -4,4 +4,5 @@ TODO
 
 ## Final Code
 
-Your code should now look something like this: [1_bootstrap.py](./guide/1_bootstrap.py).
+Your code should now look something like this:
+> [guide/1_bootstrap.py](./guide/1_bootstrap.py)
