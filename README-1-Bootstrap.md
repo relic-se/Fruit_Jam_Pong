@@ -66,9 +66,11 @@ Depending on your host computer and a number of other variables, this might just
 
 However, if you plan to manage updates to your code either by editing the file in place on your computer or copying it over, you'll want to ignore this step and keep auto-reload on.
 
-## Final Code
+## How it Works
 
-Although we didn't do too much to it, your code should now look something like this:
+I'll do my best here to quickly glance over the important bits of the bootstrap code, but feel free to [skip ahead](#next-steps) if this isn't your cup of tea.
+
+### Dynamic Module Loading
 
 ``` python
 # load included modules if we aren't installed on the root path
@@ -77,24 +79,26 @@ if len(__file__.split("/")[:-1]) > 1:
     if (modules_directory := pathlib.Path("/".join(__file__.split("/")[:-1])) / "lib").exists():
         import sys
         sys.path.append(str(modules_directory.absolute()))
+```
 
-import asyncio
-import displayio
-import sys
-import supervisor
-from terminalio import FONT
+Right at the beginning, we get started with lovely bit of code. Normally, CircuitPython searches for libraries in `/` and `/lib`. If our program is copied into a subfolder of `CIRCUITPY` or on an sd card and the libraries haven't been merged into `/lib`, it will likely crash. This snippet attempts to add the local `lib` folder into `sys.path` which is used for looking for modules. So, if someone downloads your program, extracts it, and installs it directly into `/apps/Fruit_Jam_...` or `/sd/apps/Fruit_Jam_...` for use with Fruit Jam OS, it should work without a hitch!
 
-from adafruit_display_text.label import Label
-import adafruit_fruitjam.peripherals
-import adafruit_usb_host_mouse
+### Launcher Config
 
+``` python
 # get Fruit Jam OS config if available
 try:
     import launcher_config
     config = launcher_config.LauncherConfig()
 except ImportError:
     config = None
+```
 
+Fruit Jam OS includes the file `/launcher_config.py` which is used to read settings from `launcher.conf.json` (which can be installed in `/`, `/saves`, or `/sd`). These settings are used to set up the display resolution, audio output destination, and volume among other things. If the module can't be loaded, that likely means we aren't using Fruit Jam OS. You'll see later on where we refer to this file or use a default value if it isn't found.
+
+### Display Configuration
+
+``` python
 # setup display
 displayio.release_displays()
 try:
@@ -102,7 +106,17 @@ try:
 except ValueError:  # invalid user config or no user config provided
     adafruit_fruitjam.peripherals.request_display_config(720, 400)  # default display size
 display = supervisor.runtime.display
+```
 
+Since we installed the board-specific version of CircuitPython, it knows how our Fruit Jam's hardware is configured and goes ahead and outputs video via the HDMI display (notice how REPL worked on monitor earlier). This is great, but it might not be exactly how we need it for our program.
+
+We start out with `displayio.release_displays()` which deactivates the REPL terminal. Then, we try to use the user display resolution configuration if its available ([more info](https://docs.circuitpython.org/en/latest/docs/environment.html#circuitpy-display-width-sunton-matouch)). If this doesn't work, we try to use our preferred resolution, 720x400 in this case ([see this documentation](https://docs.circuitpython.org/projects/fruitjam/en/latest/api.html#adafruit_fruitjam.peripherals.request_display_config) for supported resolutions). Then, we create a local reference to the system's display output, `supervisor.runtime.display` for future use.
+
+As you'll soon see, we're actually going to modify this portion of our program quite a bit in the next section to better suit our needs.
+
+### Hardware Peripherals & Audio
+
+``` python
 # setup audio, buttons, and neopixels
 peripherals = adafruit_fruitjam.peripherals.Peripherals(
     safe_volume_limit=(config.audio_volume_override_danger if config is not None else 12),
@@ -115,7 +129,15 @@ if config is not None:
 else:
     peripherals.audio_output = "headphone"
     peripherals.volume = 12
+```
 
+The `adafruit_fruitjam.peripherals.Peripherals` ([documentation](https://docs.circuitpython.org/projects/fruitjam/en/latest/api.html#adafruit_fruitjam.peripherals.Peripherals)) handles essentially all of our hardware resources. This is great, because it acts like an abstraction layer so that we can focus more on writing fun programs!
+
+The only configuration we need to do is set up a few audio settings so that they work with our Fruit Jam OS launcher configuration that we talked about earlier. You can change the defaults here if you'd prefer to use different settings (ie: `"speaker"` for audio output).
+
+### Drawing Text
+
+``` python
 # create root group
 root_group = displayio.Group()
 display.root_group = root_group
@@ -126,7 +148,17 @@ root_group.append(Label(
     anchor_point=(.5, .5),
     anchored_position=(display.width//2, display.height//2),
 ))
+```
 
+> First of all, this tutorial is going to require some knowledge of the core module, `displayio`, since it is going to be used to generate all of our graphics. You may need to glance over some [displayio guides](https://learn.adafruit.com/circuitpython-display-support-using-displayio/introduction) to build up a foundation of knowledge on this topic in case I'm moving too fast.
+
+In order to drive a display in CircuitPython with `displayio`, we'll need to set up a root group which all of our elements will be contained within. Simple stuff!
+
+Then, I'm using the `adafruit_display_text` library ([documentation](https://docs.circuitpython.org/projects/display_text/en/latest/index.html)) to draw some basic text centered in the middle of the display and adding that to our group.
+
+### Mouse Control Task
+
+``` python
 # mouse control
 async def mouse_task() -> None:
     while True:
@@ -149,7 +181,19 @@ async def mouse_task() -> None:
                 await asyncio.sleep(1/30)
             root_group.remove(mouse.tilegrid)
         await asyncio.sleep(1)
+```
 
+> Here comes our first `asyncio` task. I'm going to be using `asyncio` extensively in this tutorial. You may want to take a look at [the guide](https://learn.adafruit.com/cooperative-multitasking-in-circuitpython-with-asyncio/overview) in case you want more detail on how this system works.
+
+Directly talking to USB devices can be quite the chore. Instead of doing it all ourselves, we're going to take advantage of the `adafruit_usb_host_mouse` library. We'll use the method `adafruit_usb_host_mouse.find_and_init_boot_mouse` to search if a mouse is connected once every second. Once a compatible mouse is found, we center the cursor and add the provided `displayio.TileGrid` to our root group.
+
+After that, we start up another loop which will keep track of the mouse activity to decide whether it has been disconnected. If not, it can process user input. This happens 30 times every second. You'll see this number often as a typical polling rate in our application as it is the maximum frame rate we are shooting for.
+
+> There are a few pending updates to this library which might result in this control task changing slightly in the future.
+
+### Keyboard Control Task
+
+``` python
 async def keyboard_task() -> None:
     # flush input buffer
     while supervisor.runtime.serial_bytes_available:
@@ -162,7 +206,15 @@ async def keyboard_task() -> None:
                 peripherals.deinit()
                 supervisor.reload()
         await asyncio.sleep(1/30)
+```
 
+USB keyboard support is going to work a little differently than other USB devices. The CircuitPython core is already designed to handle keyboard input internally. Rather than try to take over on our side, we're just going to tap into that feed using `sys.stdin`. This also allows control of our application over serial which can be useful in some scenarios.
+
+At the moment, we're not doing much except for checking for the escape key which we'll use to reload the device. By the way, most special keys will start with `"\x1b..."`. We'll run across that later when dealing with arrow keys.
+
+### Main Loop
+
+``` python
 async def main() -> None:
     await asyncio.gather(
         asyncio.create_task(mouse_task()),
@@ -174,6 +226,14 @@ try:
 except KeyboardInterrupt:
     peripherals.deinit()
 ```
+
+In order to run these tasks concurrently, we'll need to create a main loop and use the `asyncio.gather` method to combine our mouse and keyboard tasks. We'll also check for `KeyboardInterrupt` here (Ctrl+C) as another method of exiting from the application.
+
+> Any time we exit out of our code, we want to call `peripherals.deinit()` to release all of the hardware resources controlled by `adafruit_fruitjam.peripherals.Peripherals`. This includes buttons, neopixels, and audio.
+
+## Final Code
+
+Although we didn't do too much to it, your code should now look something like this:
 
 > [guide/1_bootstrap.py](./guide/1_bootstrap.py)
 
