@@ -20,7 +20,7 @@ And for audio, we have a TLV320DAC3100 stereo DAC with headphone output and a pr
 
 One thing you don't often see with microcontrollers is USB host support. With the help of TinyUSB and PIO (a unique feature of the Raspberry Pi Pico series of microcontrollers), the Fruit Jam can support a variety of USB peripherals powered by Python user code. This is perfect for HID-compliant devices such as Keyboard, Mice, and Gamepads, all of which we will cover in this tutorial.
 
-All in all, the Fruit Jam has essentially everything you need to operate as a little microcomputer reminescent of classic platforms of days past.
+All in all, the Fruit Jam has essentially everything you need to operate as a little microcomputer reminiscent of classic platforms of days past.
 
 ## CircuitPython
 
@@ -42,7 +42,7 @@ To install the firmware, simply copy and paste (or drag) the `.uf2` file into th
 
 ## REPL
 
-You now have a working CircuitPython-powered Fruit Jam! But how do we talk to it? First of all, if you plug your device via HDMI into a display monitor, you should see a bunch of info and a prompt. This prompt is called "REPL". I won't get too deep into it, but this is basically where you can evaluate Python code in realtime ([more info](https://learn.adafruit.com/welcome-to-circuitpython/the-repl)). Heck, plug in a USB keyboard and start typing Python commands into it. If you're familiar with computers of yesteryear, it should remind you a little bit of a BASIC prompt.
+You now have a working CircuitPython-powered Fruit Jam! But how do we talk to it? First of all, if you plug your device via HDMI into a display monitor, you should see a bunch of info and a prompt. This prompt is called "REPL". I won't get too deep into it, but this is basically where you can evaluate Python code in real-time ([more info](https://learn.adafruit.com/welcome-to-circuitpython/the-repl)). Heck, plug in a USB keyboard and start typing Python commands into it. If you're familiar with computers of yesteryear, it should remind you a little bit of a BASIC prompt.
 
 Moving on, typing out python commands directly into the device is fine, but I don't recommend it for larger workflows. Instead, I recommend downloading and installing a Python IDE that is compatible with CircuitPython's REPL for writing, testing, and saving code. I personally use a combination of [VS Code](https://learn.adafruit.com/using-the-circuitpython-extension-for-visual-studio-code/overview) and [Thonny](https://thonny.org/), but play around with it and find what works best for you.
 
