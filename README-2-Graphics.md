@@ -56,7 +56,7 @@ foreground_palette[0] = 0xffffff
 
 In case you're not familiar, color values in CircuitPython use a 24-bit integer format with red, green, and blue components divided as 8-8-8 bits _(0xrrggbb in hexadecimal)_. In the above code, the value `0xffffff` corresponds to white since all components are at full brightness. If you know anything about web colors, this should be pretty familiar to you.
 
-## `vectorio`
+## Drawing Shapes
 
 Since the graphics of this game are very simple being mostly rectangles, instead of using bitmap graphics, we're going to use primitive shapes. CircuitPython has a built-in module just for this, `vectorio`. Although it can generate more complicated shapes including circles and polygons, we're going to focus in on `vectorio.Rectangle` specifically.
 
