@@ -175,7 +175,7 @@ if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >=
 
 Awesome! You can basically play pong now. All that's missing is keeping score!
 
-![Screen capture of pong with ball reset](./docs/4_ball-movement-out-of-bounds.gif)
+![Screen capture of pong with ball reset](./docs/4_ball-movement-randomize-velocity.gif)
 
 ## Ball Visibility
 
