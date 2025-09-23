@@ -97,7 +97,7 @@ for i in range(2):
     paddle = vectorio.Rectangle(
         pixel_shader=foreground_palette,
         width=4, height=32,
-        x=(display.width-16 if i else 16),
+        x=(display.width-20 if i else 16),
         y=display.height//2-8,
     )
     root_group.append(paddle)
