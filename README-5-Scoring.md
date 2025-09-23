@@ -1,6 +1,6 @@
 # [Fruit Jam Pong Tutorial](.#sections): 5. Scoring
 
-TODO
+**_Coming Soon_**
 
 ## Final Code
 

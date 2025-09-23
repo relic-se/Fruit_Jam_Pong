@@ -1,6 +1,6 @@
 # [Fruit Jam Pong Tutorial](.#sections): 8. Computer Control
 
-TODO
+**_Coming Soon_**
 
 ## Final Code
 

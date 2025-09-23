@@ -1,6 +1,6 @@
 # [Fruit Jam Pong Tutorial](.#sections): 7. Sound Effects
 
-TODO
+**_Coming Soon_**
 
 ## Final Code
 

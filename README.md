@@ -18,19 +18,19 @@ Support a variety of user inputs to control the paddles and the game state inclu
 ### [4. Ball Movement](./README-4-Ball-Movement.md)
 Control the pong ball's position with velocity and handle collisions.
 
-### [5. Scoring](./README-5-Scoring.md)
+### [5. Scoring](./README-5-Scoring.md) *- Coming Soon*
 Determine when a player has scored and handle win conditions.
 
-### [6. Increasing Difficulty](./README-6-Increasing-Difficulty.md)
+### [6. Increasing Difficulty](./README-6-Increasing-Difficulty.md) *- Coming Soon*
 Increase ball speed with each paddle hit.
 
-### [7. Sound Effects](./README-7-Sound-Effects.md)
+### [7. Sound Effects](./README-7-Sound-Effects.md) *- Coming Soon*
 Using `synthio` to create basic sound effects which closely resemble the original arcade game.
 
-### [8. Computer Control](./README-8-Computer-Control.md)
+### [8. Computer Control](./README-8-Computer-Control.md) *- Coming Soon*
 Control the CPU in a single-player match using simple logic.
 
-### [9. NeoPixels](./README-9-NeoPixels.md)
+### [9. NeoPixels](./README-9-NeoPixels.md) *- Coming Soon*
 Add some icing on top by displaying the ball position on the Fruit Jam's NeoPixels.
 
 ## Building Project Bundle

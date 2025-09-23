@@ -1,6 +1,6 @@
 # [Fruit Jam Pong Tutorial](.#sections): 6. Increasing Difficulty
 
-TODO
+**_Coming Soon_**
 
 ## Final Code
 

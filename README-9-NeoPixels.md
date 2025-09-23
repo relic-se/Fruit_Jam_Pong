@@ -1,6 +1,6 @@
 # [Fruit Jam Pong Tutorial](.#sections): 9. NeoPixels
 
-TODO
+**_Coming Soon_**
 
 ## Final Code
 
