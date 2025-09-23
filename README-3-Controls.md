@@ -86,6 +86,8 @@ async def buttons_task() -> None:
 
 Pretty simple stuff. If we're pressing Button #3 (the top one), we'll move the left paddle up (the player argument defaults to `0`). If we're pressing Button #1 (the bottom one), we'll move the left paddle down. And if all three buttons are pressed at once, we'll go ahead and exit the application.
 
+![Button controls layout](./docs/3_controls-buttons.jpg "Image sourced from Adafruit featuring product ID 6200")
+
 > At the moment, we're not using `peripherals.button2` for any specific action, but that will change later on.
 
 If you run the program now, you should be able to move the left paddle around! But let's not stop there...
@@ -123,6 +125,8 @@ Because we're reading the entire `sys.stdin` buffer at once, we can just test fo
 | `\x1b[B` | Down Arrow  |
 | `\x1b[C` | Right Arrow |
 | `\x1b[D` | Left Arrow  |
+
+![Keyboard controls layout](./docs/3_controls-keyboard.jpg "Image sourced from Adafruit featuring product ID 1736")
 
 > Want to support two player control on one keyboard? Why not change the control scheme around a bit. Maybe "W" and "S" for the left paddle and "I" and "K" for the right paddle?
 >
@@ -281,6 +285,8 @@ This is going to look pretty similar to our hardware buttons loop. We're just ch
 
 In addition to the d-pad, we're also using `JOYSTICK_UP` and `JOYSTICK_DOWN`. The `Gamepad` object automatically reads joystick inputs and translates them into simple directional boolean values if they surpass a given threshold _(I believe it's 50%?)_. More options = more better!
 
+![Gamepad controls layout](./docs/3_controls-gamepad.jpg "Image sourced from Adafruit featuring product ID 6285")
+
 Plug in a supported controller over USB and try it out for yourself. Try switching between left and right USB ports to control their corresponding paddles. Cool stuff!
 
 > To see every supported button input as well as analog inputs (joysticks and triggers), I recommend reviewing [the library documentation](https://circuitpython-usb-host-gamepad.readthedocs.io/en/latest/api.html#relic_usb_host_gamepad.Buttons).
@@ -289,6 +295,8 @@ Plug in a supported controller over USB and try it out for yourself. Try switchi
 
 That was a doozy, but your code should now look something like this:
 > [guide/3_controls.py](./guide/3_controls.py)
+
+![Left and right paddles being controlled using gamepad input](./docs/3_controls.gif)
 
 ## Next Steps
 
