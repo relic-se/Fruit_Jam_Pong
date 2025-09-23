@@ -253,11 +253,11 @@ async def gameplay_task() -> None:
 
         # only check if we've hit the bottom if y velocity is positive and if we've hit the top if y velocity is negative
         if (velocity_y < 0 and ball.y <= 0) or (velocity_y > 0 and ball.y + ball.height >= display.height):
-            velocity_y = -velocity_y  # invert y velocity
+            velocity_y *= -1  # invert y velocity
         
         # see if we've collided with a paddle
         if (velocity_x < 0 and collides(ball, paddles[0])) or (velocity_x > 0 and collides(ball, paddles[1])):
-            velocity_x = -velocity_x  # invert x velocity
+            velocity_x *= -1  # invert x velocity
             ball_speed = min(ball_speed * BALL_SPEED_MODIFIER, PADDLE_SPEED)  # increase ball speed by modifier
 
         # check if we've gone out of bounds
