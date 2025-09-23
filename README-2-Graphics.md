@@ -87,6 +87,10 @@ If you run the program, you should see the following output:
 
 ![Screen capture of center line being displayed](./docs/2_graphics-center-line.png)
 
+> You may see that there's a distinct difference between our center line and the one in the original pong arcade game. _It's not dashed!_ We definitely could make this line dashed using a loop and a individual rectangles for each segment, but I figured it looks pretty good as is and is much simpler to skip that step.
+>
+> Looking for a challenge? Try fixing this by making your center line dashed!
+
 ### Ball
 
 Let's keep the ball rolling, literally! Our pong ball will be another `vectorio.Rectangle` that is 8x8 pixels in size. I guess this ball wouldn't roll very easily since it's square and all, but we've got to keep the authentic pong experience!
