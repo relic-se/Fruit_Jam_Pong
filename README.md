@@ -9,7 +9,7 @@ Not yet familiar with your Fruit Jam or CircuitPython? We will quickly go over h
 ### [1. Bootstrap](./README-1-Bootstrap.md)
 Using the [relic-se/Fruit_Jam_Application](https://github.com/relic-se/Fruit_Jam_Application) template to skip a few steps...
 
-### [2. Graphics](./README-2-Modulation.md)
+### [2. Graphics](./README-2-Graphics.md)
 Getting straight to it by using `displayio` to set up our pong playing field.
 
 ### [3. Controls](./README-3-Controls.md)
