@@ -54,6 +54,8 @@ async def gameplay_task() -> None:
         await asyncio.sleep(1/30)
 ```
 
+![Screen capture of pong with ball velocity](./docs/4_ball-movement-velocity.gif)
+
 ## Wall Bouncing
 
 If you run the program now, you should notice that the ball just goes down and to the right and then disappears forever! That's not good, but we can fix that. After applying the velocity to the ball, we're going to be doing some basic logic checks to see if we need to "bounce" the ball on the top and bottom walls. In order to do this "bounce", all we need to do is invert the velocity by multiplying it by -1.
@@ -65,6 +67,8 @@ if (velocity_y < 0 and ball.y <= 0) or (velocity_y > 0 and ball.y + ball.height 
 ```
 
 > **Hot Tip:** One trick here is that we're first checking the direction of the velocity before testing the ball position. This is very helpful to keep us from running into a situation where the ball gets stuck on one wall, constantly inverting its velocity every frame. Once we're done testing in one direction, we move on to start testing in the next direction and don't change until we bounce.
+
+![Screen capture of pong with wall bouncing](./docs/4_ball-movement-wall-bouncing.gif)
 
 ## Paddle Collision
 
@@ -96,7 +100,9 @@ if (velocity_x < 0 and collides(ball, paddles[0])) or (velocity_x > 0 and collid
 
 > Once again, see how we're testing the direction of the x velocity of the ball? This should improve both performance and reliability.
 
-Simple stuff, if we hit either paddle, we just change our ball x velocity. Now, if you run the program, you basically have a working game of Pong! But you'll probably run into the next problem: once you miss and the ball goes off screen, it ain't coming back.
+Simple stuff, if we hit either paddle, we just change our ball x velocity. Now, if you run the program, you've got yourself a sort-of working game of Pong! But you'll probably run into the next problem: once you miss and the ball goes off screen, it ain't coming back.
+
+![Screen capture of pong with paddle collision](./docs/4_ball-movement-paddle-collision.gif)
 
 ## Out of Bounds
 
@@ -120,9 +126,11 @@ After our quick test against `ball.x` to check if its off screen, we're going to
 
 After that, we want to recenter the ball and continue the gameplay loop.
 
+![Screen capture of pong with ball reset](./docs/4_ball-movement-out-of-bounds.gif)
+
 ## Randomize Velocity
 
-This is cool and all, but having the ball start in only one direction is a bit too predictable. Let's create a method to randomize both the starting velocity and when the ball resets. In order to do this, we're going to need to built-in `random` core module ([documentation](https://docs.circuitpython.org/en/latest/shared-bindings/random/index.html#module-random)).
+This is cool and all, but having the ball start in the same direction it last was heading is a bit too predictable. Let's create a method to randomize both the starting velocity and when the ball resets. In order to do this, we're going to need to built-in `random` core module ([documentation](https://docs.circuitpython.org/en/latest/shared-bindings/random/index.html#module-random)).
 
 Go ahead and include it in your program by adding the following line to the top:
 
@@ -166,6 +174,8 @@ if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >=
 ```
 
 Awesome! You can basically play pong now. All that's missing is keeping score!
+
+![Screen capture of pong with ball reset](./docs/4_ball-movement-out-of-bounds.gif)
 
 ## Ball Visibility
 
@@ -216,6 +226,8 @@ if (velocity_x < 0 and ball.x + ball.width < 0) or (velocity_x > 0 and ball.x >=
     # show the ball
     ball.hidden = False
 ```
+
+![Screen capture of pong with reset delay](./docs/4_ball-movement-ball-visibility.gif)
 
 ## Final Code
 
