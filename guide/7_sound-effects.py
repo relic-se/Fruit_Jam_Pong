@@ -217,7 +217,7 @@ async def mouse_task() -> None:
                     timeouts += 1
                 else:
                     timeouts = 0
-                    if "left" in pressed_btns and (previous_pressed_btns is None or "left" not in previous_pressed_btns):
+                    if waiting and "left" in pressed_btns and (previous_pressed_btns is None or "left" not in previous_pressed_btns):
                         waiting = False
                 previous_pressed_btns = pressed_btns
                 await asyncio.sleep(1/30)
@@ -237,7 +237,7 @@ async def keyboard_task() -> None:
                 paddle_move(1)
             elif key == "\x1b[B" or key == "\x1b[C":  # down or right
                 paddle_move(-1)
-            elif key == "\n" or key == " ":  # enter or space
+            elif waiting and (key == "\n" or key == " "):  # enter or space
                 waiting = False
             elif key == "\x1b":  # escape
                 peripherals.deinit()
@@ -256,7 +256,7 @@ async def gamepad_task() -> None:
                     paddle_move(1, player=i)
                 elif gamepad.buttons.DOWN or gamepad.buttons.JOYSTICK_DOWN:  # down
                     paddle_move(-1, player=i)
-                if gamepad.buttons.A or gamepad.buttons.START:  # A or X on DS4
+                if waiting and (gamepad.buttons.A or gamepad.buttons.START):  # A or X on DS4
                     waiting = False
                 if gamepad.buttons.HOME:  # home
                     peripherals.deinit()
@@ -294,8 +294,6 @@ def collides(a: vectorio.Rectangle, b: vectorio.Rectangle) -> bool:
     return True
 
 async def gameplay_task() -> None:
-    global waiting
-
     # wait for initial input
     await wait_input()
 
