@@ -43,6 +43,8 @@ Remember when I said that our score labels were going to store the score value f
 
 If you run the game, you should now see the score of the winning player going up for each round. Only problem now is that the game never ends!
 
+![Screen capture of player score increasing](./docs/5_scoring-increment.gif)
+
 ## Checking Win State
 
 Now, let's implement the rules we listed above to determine if the player who just scored has won the game. Add the following code after adding to the player score:
@@ -60,6 +62,10 @@ if score >= WIN_SCORE:
 ```
 
 As you can see, we've implemented rules #2 (`score >= WIN_SCORE`) and #3 (`score - other_score >= WIN_DIFF`) using basic conditional logic. If the win state is achieved, we reset the scores and then continue through the rest of the reset script.
+
+![Screen capture of player score being reset after win](./docs/5_scoring-reset.gif)
+
+> By the way, I sped up the ball speed using `BALL_SPEED = 3` for this particular example.
 
 This works an all now, but it still doesn't give the player much of an opportunity to take a break or even see what their final score was before everything resets and continues playing.
 
@@ -243,6 +249,8 @@ if score >= WIN_SCORE:
         win_labels[player].hidden = True
         # ...
 ```
+
+![Screen capture of win label](./docs/5_scoring-win.png)
 
 There you go! Now, there's no question about it who won the game.
 
