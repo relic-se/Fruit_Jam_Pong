@@ -18,7 +18,7 @@ Support a variety of user inputs to control the paddles and the game state inclu
 ### [4. Ball Movement](./README-4-Ball-Movement.md)
 Control the pong ball's position with velocity and handle collisions.
 
-### [5. Scoring](./README-5-Scoring.md) *- Coming Soon*
+### [5. Scoring](./README-5-Scoring.md)
 Determine when a player has scored and handle win conditions.
 
 ### [6. Increasing Difficulty](./README-6-Increasing-Difficulty.md) *- Coming Soon*
