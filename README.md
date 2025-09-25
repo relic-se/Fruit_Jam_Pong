@@ -21,7 +21,7 @@ Control the pong ball's position with velocity and handle collisions.
 ### [5. Scoring](./README-5-Scoring.md)
 Determine when a player has scored and handle win conditions.
 
-### [6. Increasing Difficulty](./README-6-Increasing-Difficulty.md) *- Coming Soon*
+### [6. Increasing Difficulty](./README-6-Increasing-Difficulty.md)
 Increase ball speed with each paddle hit.
 
 ### [7. Sound Effects](./README-7-Sound-Effects.md) *- Coming Soon*
